@@ -77,7 +77,7 @@
 
             if (code === null || state !== sessionStorage.getItem("state"))
                 beginLogin();
-            else if (access_token = null)
+            else if (access_token === null)
                 exchangeCode();
 		</script>
     </body>
