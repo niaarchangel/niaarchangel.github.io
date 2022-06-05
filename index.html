@@ -22,17 +22,22 @@
             let state = new URLSearchParams(url.search).get('state');
 
             let beginLogin = async () => {
-                let newState = await window.crypto.subtle.generateKey(
-                    {
-                        name: "AES-GCM",
-                        length: 25
-                    },
-                    true,
-                    ["encrypt", "decrypt"]
-                );
-                let exportedState = await crypto.subtle.exportKey('raw', newState);
-                sessionStorage.setItem("state", exportedState);
-                window.location.replace(`https://api.restream.io/login?response_type=code&client_id=${CLIENT_ID}&redirect_uri=https://niaarchangel.github.io/&state=${exportedState}`);
+                try {
+                    let newState = await window.crypto.subtle.generateKey(
+                        {
+                            name: "AES-GCM",
+                            length: 25
+                        },
+                        true,
+                        ["encrypt", "decrypt"]
+                    );
+                    let exportedState = await crypto.subtle.exportKey('raw', newState);
+                    sessionStorage.setItem("state", exportedState);
+                    window.location.replace(`https://api.restream.io/login?response_type=code&client_id=${CLIENT_ID}&redirect_uri=https://niaarchangel.github.io/&state=${exportedState}`);
+                }
+                catch (err) {
+                    console.log(err);
+                }
             }
             
             let refreshCode = async () => {
