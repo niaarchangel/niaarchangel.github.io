@@ -7,7 +7,7 @@
         <title>HTML Boilerplate</title>
     </head>
     <body>
-        <p>Added cors fix</p>
+        <p>Attempted another cors fix</p>
         <script>
             const CLIENT_ID = "c0d475c5-e16e-47e0-aa04-4af577c2b256";
             const CLIENT_SECRET = "c320a9a0-1a52-4d03-88cb-a777bdf3a0f9";
@@ -35,6 +35,7 @@
             let refreshCode = async () => {
                 console.log("We shouldn't be refreshing yet");
                 let response = await fetch('https://api.restream.io/oauth/token', {
+                    mode: 'cors',
                     method: 'POST',
                     credentials: 'include',
                     headers: {
@@ -57,6 +58,7 @@
             let exchangeCode = async () => {
                 console.log("Exchanging Codes now");
                 let response = await fetch('https://api.restream.io/oauth/token', {
+                    mode: 'cors',
                     method: 'POST',
                     credentials: 'include',
                     headers: {
