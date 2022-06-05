@@ -9,14 +9,78 @@
     <body>
         <p>Now updated for redirect</p>
         <script>
-            var url = window.location;
+            const CLIENT_ID = "c0d475c5-e16e-47e0-aa04-4af577c2b256";
+            const CLIENT_SECRET = "c320a9a0-1a52-4d03-88cb-a777bdf3a0f9";
+            let url = window.location;
 
-            var code = new URLSearchParams(url.search).get('code');
-            var scope = new URLSearchParams(url.search).get('scope');
-            var state = new URLSearchParams(url.search).get('state');
+            let access_token = null;
+            let refresh_token = null;
+            let access_refresh = null;
 
-            if (code === null)
-                window.location.replace("https://api.restream.io/login?response_type=code&client_id=c0d475c5-e16e-47e0-aa04-4af577c2b256&redirect_uri=https://niaarchangel.github.io/");
+            let code = new URLSearchParams(url.search).get('code');
+            let scope = new URLSearchParams(url.search).get('scope');
+            let state = new URLSearchParams(url.search).get('state');
+
+            let beginLogin = async () => {
+                let newState = await window.crypto.subtle.generateKey(
+                    {
+                        name: "AES-GCM",
+                        length: 25
+                    },
+                    true,
+                    ["encrypt", "decrypt"]
+                );
+                let exportedState = await crypto.subtle.exportKey('raw', newState);
+                sessionStorage.setItem("state", exportedState);
+                window.location.replace(`https://api.restream.io/login?response_type=code&client_id=${CLIENT_ID}&redirect_uri=https://niaarchangel.github.io/&state=${exportedState}`);
+            }
+            
+            let refreshCode = async () => {
+                console.log("We shouldn't be refreshing yet");
+                let response = await fetch('https://api.restream.io/oauth/token', {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        Authorization: `Basic ${btoa(CLIENT_ID + ":" + CLIENT_SECRET)}`
+                    },
+                    body: `grant_type=refresh_token&refresh_token=${refresh_token}`
+                })
+
+                if ("error" in response.body) {
+                    beginLogin()
+                } else {
+                    access_token = response.body.access_token;
+                    refresh_token = response.body.refresh_token;
+                    access_refresh = setTimeout(refreshCode, ((response.body.accessTokenExpiresIn/60)-5)*60000);
+                }
+            }
+
+            let exchangeCode = async () => {
+                let response = await fetch('https://api.restream.io/oauth/token', {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        Authorization: `Basic ${btoa(CLIENT_ID + ":" + CLIENT_SECRET)}`
+                    },
+                    body: `grant_type=authorization_code&redirect_uri=https://niaarchangel.github.io/&code=${code}`
+                })
+
+                if ("error" in response.body) {
+                    beginLogin()
+                } else {
+                    access_token = response.body.access_token;
+                    refresh_token = response.body.refresh_token;
+                    access_refresh = setTimeout(refreshCode, ((response.body.accessTokenExpiresIn/60)-5)*60000);
+                    console.log(access_token)
+                }
+            }
+
+            if (code === null || state !== sessionStorage.getItem("state"))
+                beginLogin();
+            else if (access_token = null)
+                exchangeCode();
 		</script>
     </body>
 </html>
