@@ -25,7 +25,7 @@
                 try {
                     let newState = await window.crypto.subtle.generateKey(
                         {
-                            name: "AES-GCM",
+                            name: "AES-CBC",
                             length: 25
                         },
                         true,
