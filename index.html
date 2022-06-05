@@ -7,7 +7,7 @@
         <title>HTML Boilerplate</title>
     </head>
     <body>
-        <p>new update to add different text now</p>
+        <p>oaep test</p>
         <script>
             const CLIENT_ID = "c0d475c5-e16e-47e0-aa04-4af577c2b256";
             const CLIENT_SECRET = "c320a9a0-1a52-4d03-88cb-a777bdf3a0f9";
@@ -25,7 +25,7 @@
                 try {
                     let newState = await window.crypto.subtle.generateKey(
                         {
-                            name: "AES-CBC",
+                            name: "RSA-OAEP",
                             length: 25
                         },
                         true,
